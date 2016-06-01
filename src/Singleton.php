@@ -1,102 +1,64 @@
 <?php
+# NOTICE OF LICENSE
+#
+# This source file is subject to the Open Software License (OSL 3.0)
+# that is available through the world-wide-web at this URL:
+# http://opensource.org/licenses/osl-3.0.php
+#
+# -----------------------
+# @author: Iván Miranda
+# @version: 1.0.0
+# -----------------------
+# Simplifies the use of singleton pattern
+# -----------------------
+
 namespace Sincco\Tools;
 
-final class Singleton {
+final class Singleton extends \stdClass {
 	/**
 	 * An array of instances
 	 * @var array
 	 */
-	protected static $instances = array();
+	protected static $instances = [];
 	
-	public static function get( $class ) {
-		
-	}
 	/**
-	 * get a reference for a static instance storage
-	 * @static
-	 * @param string $name		Optional. The name of the instance.
-	 * @return array&
+	 * Gets an instance for a
+	 * @param  string $class Class required
+	 * @param  mixed  $params Params for constructor
+	 * @param  string $name  Identifier
+	 * @return object        Class required
 	 */
-	private static function &getRef($name = null) {
-		$cn		= get_called_class();
-		if (!isset(self::$instances[$cn])) {
-			self::$instances[$cn]	= array();
+	public static function get( $class, $params = null, $name = "Global" ) {
+		if( ! isset( self::$instances[ $name . "::" . $class ] ) )
+			self::$instances[ $name . "::" . $class ] = new $class( $params );
+		return self::$instances[ $name . "::" . $class ];
+	}
+
+	/**
+	 * Destroy an instance
+	 * @param  string $class Class to be destroyed
+	 * @param  string $name  Identifier
+	 * @return none
+	 */
+	public static function destroy( $class, $name = "Global" ) {
+		unset( self::$instances[ $name . "::" . $class ] );
+	}
+
+	/**
+	 * Destroy all instances
+	 * @return none
+	 */
+	public static function destroyAll() {
+		foreach (self::$instances as $key => $value) {
+			unset( self::$instances[ $key ] );
 		}
-		$name	= $name ? $name : '_';
-		if (!isset(self::$instances[$cn][$name])) {
-			self::$instances[$cn][$name]	= null;
-		}
-		return self::$instances[$cn][$name];
 	}
+
 	/**
-	 * Is an instance set?
-	 * @static
-	 * @param string $name		Optional.
-	 * @return bool
-	 */
-	public static function hasInstance($name = null) {
-		$cn		= get_called_class();
-		$name	= $name ? $name : '_';
-		return isset(self::$instances[$cn][$name]);
-	}
-	/**
-	 * Singleton pattern
-	 * @param string $name		Optional.
-	 * @return mixed
-	 */
-	public static function getInstance($name = null) {
-		if (self::hasInstance($name)) {
-			return self::getRef($name);
-		}
-		return null;
-	}
-	/**
-	 * @static
-	 * @param Singleton $instance
-	 * @param string $name			Optional. Set if you want to name this instance.
-	 * @return void
-	 */
-	public static function setInstance(Singleton $instance, $name = null) {
-		$ref = &self::getRef($name);
-		$ref = $instance;
-	}
-	/**
-	 * reset the instance to null
-	 * @static
-	 * @param string $name		Optional.
-	 * @return void
-	 */
-	public static function clearInstance($name = null) {
-		$cn		= get_called_class();
-		$name	= $name ? $name : '_';
-		unset(self::$instances[$cn][$name]);
-	}
-	/**
-	 * @static
+	 * Return indentifiers for all the instances
 	 * @return array
 	 */
-	public static function getAllInstances() {
-		$cn		= get_called_class();
-		if (isset(self::$instances[$cn])) {
-			return self::$instances[$cn];
-		}
-		return array();
-	}
-	/**
-	 * Unset all instances
-	 * @static
-	 */
-	public static function clearAllInstances() {
-		$keysToClear = array();
-		foreach (self::$instances as $className => $classInstances) {
-			foreach ($classInstances as $instanceName => $instance) {
-				if (!$instance instanceof GlobalSingleton) {
-					$keysToClear[]	= $className;
-				}
-			}
-		}
-		foreach ($keysToClear as $key) {
-			unset(self::$instances[$key]);
-		}
+	public static function instances() {
+		return array_keys( self::$instances );
 	}
 }
