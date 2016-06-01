@@ -6,7 +6,7 @@
 # http://opensource.org/licenses/osl-3.0.php
 #
 # -----------------------
-# @author: Iván Miranda
+# @author: Iván Miranda @deivanmiranda
 # @version: 1.0.0
 # -----------------------
 # Simplifies the use of singleton pattern
